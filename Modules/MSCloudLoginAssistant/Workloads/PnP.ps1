@@ -286,6 +286,35 @@ function Connect-MSCloudLoginPnP
                 $Script:MSCloudLoginConnectionProfile.PnP.MultiFactorAuthentication = $false
                 $Script:MSCloudLoginConnectionProfile.PnP.Connected = $true
             }
+            elseif ($Script:MSCloudLoginConnectionProfile.PnP.AuthenticationType -eq 'CredentialsWithApplicationId')
+            {
+                if ($Script:MSCloudLoginConnectionProfile.PnP.ConnectionUrl -or $ForceRefreshConnection)
+                {
+                    Add-MSCloudLoginAssistantEvent -Message 'Connecting with Credentials - ApplicationId' -Source $source
+                    Add-MSCloudLoginAssistantEvent -Message "URL: $($Script:MSCloudLoginConnectionProfile.PnP.ConnectionUrl)" -Source $source
+                    Add-MSCloudLoginAssistantEvent -Message "ConnectionUrl: $($Script:MSCloudLoginConnectionProfile.PnP.ConnectionUrl)" -Source $source
+                    Add-MSCloudLoginAssistantEvent -Message "ApplicationId: $($Script:MSCloudLoginConnectionProfile.PnP.ApplicationId)" -Source $source
+                    Connect-PnPOnline -Url $Script:MSCloudLoginConnectionProfile.PnP.ConnectionUrl `
+                        -ClientId $Script:MSCloudLoginConnectionProfile.PnP.ApplicationId `
+                        -Credentials $Script:MSCloudLoginConnectionProfile.PnP.Credentials `
+                        -AzureEnvironment $Script:MSCloudLoginConnectionProfile.PnP.PnPAzureEnvironment
+                }
+                else
+                {
+                    Add-MSCloudLoginAssistantEvent -Message 'Connecting with Credentials - ApplicationId' -Source $source
+                    Add-MSCloudLoginAssistantEvent -Message "URL: $($Script:MSCloudLoginConnectionProfile.PnP.ConnectionUrl)" -Source $source
+                    Add-MSCloudLoginAssistantEvent -Message "AdminUrl: $($Script:MSCloudLoginConnectionProfile.PnP.AdminUrl)" -Source $source
+                    Add-MSCloudLoginAssistantEvent -Message "ApplicationId: $($Script:MSCloudLoginConnectionProfile.PnP.ApplicationId)" -Source $source
+                    Connect-PnPOnline -Url $Script:MSCloudLoginConnectionProfile.PnP.AdminUrl `
+                        -ClientId $Script:MSCloudLoginConnectionProfile.PnP.ApplicationId `
+                        -Credentials $Script:MSCloudLoginConnectionProfile.PnP.Credentials `
+                        -AzureEnvironment $Script:MSCloudLoginConnectionProfile.PnP.PnPAzureEnvironment
+                }
+
+                $Script:MSCloudLoginConnectionProfile.PnP.ConnectedDateTime = [System.DateTime]::Now.ToString()
+                $Script:MSCloudLoginConnectionProfile.PnP.MultiFactorAuthentication = $false
+                $Script:MSCloudLoginConnectionProfile.PnP.Connected = $true
+            }
             elseif ($Script:MSCloudLoginConnectionProfile.PnP.AuthenticationType -eq 'Identity')
             {
                 if ($Script:MSCloudLoginConnectionProfile.PnP.ConnectionUrl)
